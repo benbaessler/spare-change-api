@@ -1,5 +1,6 @@
 import stripe
 import json
+import math
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
@@ -35,16 +36,21 @@ def webhook():
     return jsonify({'error': str(e)})
 
   if event.type == 'charge.succeeded':
-    print(event.data.object.amount)
+    charge_amount = event.data.object.amount
+    print('Change:', str(round_up(charge_amount)))
   else:
     print('Not relevant')
 
   return jsonify({'status': 'success'})
 
 def round_up(amount):
-  amount = int(amount)
   
+  if str(amount)[-2:] == '00':
+    return 1
 
+  amount_int = amount / 100
+  rounded_up = math.ceil(amount_int)
+  return round(rounded_up - amount_int, 2)
 
 if __name__ == '__main__':
   app.run(port=4242)
