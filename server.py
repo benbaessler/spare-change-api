@@ -9,10 +9,8 @@ app = Flask(__name__)
 def webhook():
   payload = request.data
 
-  keys = {}
-
-  with open('keys.json', 'r') as file:
-    keys = json.loads(file.read())
+  file = open('keys.json', 'r')
+  keys = json.load(file)
 
   endpoint_secret = keys['endpoint_secret']
 
@@ -30,11 +28,13 @@ def webhook():
   if event.type == 'charge.succeeded':
     obj = event.data.object
     if obj.description == 'sct':
+      # print(event)
       print('Change charged!', obj.amount)
       
     else:
       print('Status:', obj.status)
       print('Amount:', obj.amount)
+      # print(event)
       transfer.charge_change(obj.amount, keys['customer_id'])
   else:
     print('Not relevant')

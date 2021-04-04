@@ -2,9 +2,8 @@ import stripe
 import math
 import json
 
-keys = {}
-with open('keys.json', 'r') as file:
-  keys = json.loads(file.read())
+file = open('keys.json', 'r')
+keys = json.load(file)
 
 stripe.api_key = keys['api_key']
 
@@ -16,12 +15,18 @@ def calculate_change(amount):
   return rounded_up - amount
 
 def charge_change(amount, customer_id):
-  stripe.Charge.create(
-    amount = calculate_change(amount),
-    currency = 'eur',
-    customer = customer_id,
-    description = 'sct'
-  )
+  change = calculate_change(amount)
+  if change >= 50:
+    stripe.Charge.create(
+      amount = change,
+      currency = 'eur',
+      customer = customer_id,
+      description = 'sct'
+    )
+  else:
+    keys['saved_change'] += change
+    with open('keys.json', 'w') as file:
+      json.dump(keys, file)
 
 # instance = stripe.Customer.create(
 #   email = 'test@gmail.com',
