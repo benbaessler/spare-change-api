@@ -1,20 +1,12 @@
 import stripe
+import transfer
 import json
-import math
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
-  # Simple deserialization:
-  # json_payload = json.loads(request.data)
-  # event = stripe.Event.construct_from(json_payload, stripe.api_key)
-  # print(event.type)
-  # print(type(event.data.object))
-  # print(event.data.object.id)
-
-  # With signature verification:
   payload = request.data
 
   keys = {}
@@ -36,21 +28,18 @@ def webhook():
     return jsonify({'error': str(e)})
 
   if event.type == 'charge.succeeded':
-    charge_amount = event.data.object.amount
-    print('Change:', str(round_up(charge_amount)))
+    obj = event.data.object
+    if obj.description == 'sct':
+      print('Change charged!', obj.amount)
+      
+    else:
+      print('Status:', obj.status)
+      print('Amount:', obj.amount)
+      transfer.charge_change(obj.amount, keys['customer_id'])
   else:
     print('Not relevant')
 
   return jsonify({'status': 'success'})
-
-def round_up(amount):
-  
-  if str(amount)[-2:] == '00':
-    return 1
-
-  amount_int = amount / 100
-  rounded_up = math.ceil(amount_int)
-  return round(rounded_up - amount_int, 2)
 
 if __name__ == '__main__':
   app.run(port=4242)
