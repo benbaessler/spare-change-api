@@ -1,7 +1,7 @@
-import stripe
-import transfer
-import json
 from flask import Flask, jsonify, request
+import stripe
+import change
+import json
 
 app = Flask(__name__)
 
@@ -27,15 +27,16 @@ def webhook():
 
   if event.type == 'charge.succeeded':
     obj = event.data.object
+    amount = obj.amount
     if obj.description == 'sct':
       # print(event)
-      print('Change charged!', obj.amount)
+      print('Change charged!', amount)
       
     else:
       print('Status:', obj.status)
-      print('Amount:', obj.amount)
+      print('Amount:', amount)
       # print(event)
-      transfer.charge_change(obj.amount, keys['customer_id'])
+      change.charge(amount, keys['customer_id'])
   else:
     print('Not relevant')
 
