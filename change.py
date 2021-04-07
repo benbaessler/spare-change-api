@@ -17,7 +17,7 @@ def create_charge(amount, customer_id):
     amount = amount,
     currency = 'eur',
     customer = customer_id,
-    description = 'sct'
+    description = 'sct',
   )
 
 def charge(amount, customer_id):
