@@ -21,22 +21,22 @@ def create_charge(amount, customer_id):
   )
 
 def charge(amount, customer_id):
-  _keys = json.load(open('keys.json', 'r'))
+  customer = json.load(open('customer.json', 'r'))
   change = calculate_change(amount)
   if change >= 50:
     create_charge(change, customer_id)
   else:
-    _keys['saved_change'] += change
-    with open('keys.json', 'w') as f:
+    customer['saved_change'] += change
+    with open('customer.json', 'w') as f:
       json.dump(_keys, f)
 
-    f = open('keys.json', 'r')
-    keys_updated = json.load(f)
+    f = open('customer.json', 'r')
+    customer_updated = json.load(f)
 
-    change = keys_updated['saved_change']
+    change = customer_updated['saved_change']
 
     if change >= 50:
       create_charge(change, customer_id)
-      keys_updated['saved_change'] = 0
+      customer_updated['saved_change'] = 0
       with open('keys.json', 'w') as f:
         json.dump(keys_updated, f)

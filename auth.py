@@ -18,7 +18,7 @@ print('Creating payment method...')
 payment = stripe.PaymentMethod.create(
   type = 'card',
   card = {
-    'number': '4000002500003155',
+    'number': '4932292929292999',
     'exp_month': 2,
     'exp_year': 2025,
     'cvc': '123'
@@ -27,10 +27,14 @@ payment = stripe.PaymentMethod.create(
 print('Success')
 
 print('Confirming setup intent...')
-stripe.SetupIntent.confirm(
-  intent['id'],
-  payment_method = payment
-)
+try:
+  stripe.SetupIntent.confirm(
+    intent['id'],
+    payment_method = payment
+  )
+except stripe.error.CardError as e:
+  print('Invalid card credentials!')
+
 print('Success')
 
 obj = {

@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 import stripe
-import change
+import charge
 import json
 
 app = Flask(__name__)
@@ -9,8 +9,7 @@ app = Flask(__name__)
 def webhook():
   payload = request.data
 
-  file = open('keys.json', 'r')
-  keys = json.load(file)
+  keys = json.load(open('keys.json', 'r'))
 
   endpoint_secret = keys['endpoint_secret']
 
@@ -36,6 +35,7 @@ def webhook():
       print('Status:', obj.status)
       print('Amount:', amount)
       # print(event)
+      customer = json.load(open('customer.json', 'r'))
       change.charge(amount, keys['customer_id'])
   else:
     print('Not relevant')
